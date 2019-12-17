@@ -1,22 +1,37 @@
-# Node.js with Angular
-# Build a Node.js project that uses Angular.
-# Add steps that analyze code, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
-
 trigger:
 - master
-
 pool:
-  vmImage: 'ubuntu-latest'
+  name: Hosted Ubuntu 1604
 
+# jobs:
+#   - job: install
+#     pool:
+#       vmImage: 'Ubuntu 16.04'
+#     steps:
+#     - bash: npm install
+#       displayName: NPM Install Dependencies
+#       condition: ne(variables['CacheRestored'], 'true')
+#     - bash: ng lint
+#       displayName: Run Angular linting
+# - task: RestoreAndSaveCache@1
+#   inputs:
+#     keyfile: '**/package-lock.json, !**/node_modules/**/package-lock.json, !**/.*/**/package-lock.json'
+#     targetfolder: '**/node_modules, !**/node_modules/**/node_modules'
+#     vstsFeed: '106881c5-1e85-4e16-a467-be2702084631'
+#     platformIndependent: true
 steps:
-- task: NodeTool@0
-  inputs:
-    versionSpec: '10.x'
-  displayName: 'Install Node.js'
-
-- script: |
-    npm install -g @angular/cli
-    npm install
-    ng build --prod
-  displayName: 'npm install and build'
+# - task: RestoreAndSaveCache@1
+#   inputs:
+#     keyfile: '**/package-lock.json, !**/node_modules/**/package-lock.json, !**/.*/**/package-lock.json'
+#     targetfolder: '**/node_modules, !**/node_modules/**/node_modules'
+#     vstsFeed: '106881c5-1e85-4e16-a467-be2702084631'
+#     platformIndependent: true
+- bash: npm ci
+  displayName: NPM Install Dependencies
+  # condition: ne(variables['CacheRestored'], 'true')
+- bash: npm run lint
+  displayName: Run Angular linting
+- bash: npm run test
+  displayName: Run unit tests
+- bash: npm run build
+  displayName: Build Angular application
